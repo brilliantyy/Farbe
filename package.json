@@ -1,0 +1,24 @@
+{
+    "name": "farbe",
+    "version": "1.0.0",
+    "description": "A scaffold for building front-end project",
+    "bin": {
+        "farbe create": "./bin/init.js"
+    },
+    "main": "./bin/index.js",
+    "scripts": {
+        "serve": ""
+    },
+    "keywords": [
+        ""
+    ],
+    "author": "brilliantyy",
+    "license": "ISC",
+    "dependencies": {
+        "cfonts": "^2.8.5",
+        "chalk": "^4.1.0",
+        "commander": "^5.1.0",
+        "glob": "^7.1.6",
+        "inquirer": "^7.3.2"
+    }
+}
