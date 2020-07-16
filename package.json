@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "description": "A scaffold for building front-end project",
     "bin": {
-        "farbe create": "./bin/init.js"
+        "farbe": "bin/init.js"
     },
-    "main": "./bin/index.js",
+    "main": "bin/index.js",
     "scripts": {
         "serve": ""
     },
@@ -18,6 +18,7 @@
         "cfonts": "^2.8.5",
         "chalk": "^4.1.0",
         "commander": "^5.1.0",
+        "download-git-repo": "^3.0.2",
         "glob": "^7.1.6",
         "inquirer": "^7.3.2",
         "ora": "^4.0.4"
