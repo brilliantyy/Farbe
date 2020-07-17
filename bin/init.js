@@ -4,13 +4,14 @@ const program = require('commander')
 const path = require('path')
 const glob = require('glob')
 const fs = require('fs')
+const CFonts = require('cfonts')
 const chalk = require('chalk')
 const inquirer = require('inquirer')
 
 const deleteDir = require('../lib/delete')
 const download = require('../lib/download-repo')
 
-program.name('farbe create')
+program.name('farbe')
         .usage('<project-name>')
         .parse(process.argv)
 
@@ -19,6 +20,16 @@ if (!projectName) {
     program.help()
     return
 }
+
+CFonts.say('Farbe', {
+    font: 'simple',
+    align: 'left',
+    colors: ['yellowBright'],
+    letterSpacing: 1, 
+    lineHeight: 1,
+    space: true,
+    maxLength: '0',
+})
 
 const fileList = glob.sync('*')
 let next = null
@@ -35,7 +46,7 @@ if (fileList.length) {
         next = inquirer.prompt([
             {
                 name: 'isReplace',
-                message: `同名项目${projectName}已存在，是否覆盖？`,
+                message: `同名文件夹${projectName}已存在，是否覆盖？`,
                 type: 'confirm',
                 default: true
             }
@@ -45,13 +56,14 @@ if (fileList.length) {
                 rootName = projectName
                 return Promise.resolve(projectName)
             } else {
-                next = null
+                return Promise.reject()
             }
         })
     } else {
         rootName = projectName
         next = Promise.resolve(projectName)
     }
+
 } else if (rootName === projectName) {
     rootName = '.'
     next = inquirer.prompt([
@@ -73,14 +85,56 @@ next && createProjectDir()
 
 function createProjectDir () {
     next.then(projectName => {
+        return inquirer.prompt([
+            {
+                type: 'list',
+                name: 'projectType',
+                message: '请选择项目类型：',
+                choices: [
+                    'Vue',
+                    'React'
+                ],
+                filter: (val) => { return val.toLowerCase() }
+            }
+        ]).then(answer => {
+            const projectType = answer.projectType
+            return Promise.resolve({ projectName, projectType })
+        })
+    }).then(({ projectName }) => {
         if (projectName !== '.') {
             fs.mkdirSync(projectName)
         }
-        return download(projectName).then(template => {
+
+        return download(projectType, projectName).then(template => {
             return {
                 projectName,
                 template
             }
         })
-    })
+    }).then(context => {
+        return inquirer.prompt([
+            {
+                name: 'projectName',
+                message: '项目名称',
+                default: context.name
+            },
+            {
+                name: 'projectVersion',
+                message: '版本号',
+                default: '1.0.0'
+            },
+            {
+                name: 'projectDescription',
+                message: '项目描述',
+                default: ''
+            }
+        ]).then(answer => {
+
+        })
+    }).then(context => {
+        console.log('开始生成文件')
+        return generator(context)
+    }).then(context => {
+        console.log('创建成功')
+    }).catch(err => {})
 }
