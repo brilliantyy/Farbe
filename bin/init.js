@@ -15,6 +15,7 @@ const generator = require('../lib/generator')
 const cwd = process.cwd()
 
 program.name('farbe')
+        .version('0.1.1')
         .usage('<project-name>')
         .parse(process.argv)
 
@@ -92,8 +93,7 @@ function createProjectDir () {
                 choices: [
                     'Vue',
                     'React'
-                ],
-                filter: (val) => { return val.toLowerCase() }
+                ]
             }
         ]).then(answer => {
             const projectType = answer.projectType
@@ -107,7 +107,8 @@ function createProjectDir () {
         return download(projectType, projectName).then(template => {
             return {
                 projectName,
-                template
+                template,
+                projectType
             }
         })
     }).then(context => {
@@ -125,15 +126,28 @@ function createProjectDir () {
             {
                 name: 'projectDescription',
                 message: '项目描述',
-                default: ''
+                default: `${context.projectType} 项目`
             }
         ]).then(answer => {
-            return {
-                ...context,
-                metaData: {
-                    ...answer
-                }
+            // return {
+            //     ...context,
+            //     metaData: {
+            //         ...answer
+            //     }
+            // }
+            let next = null
+            switch (context.projectType) {
+                case 'Vue':
+                    next = inquirer.prompt([
+                        {
+                            name: 'useElementUI'
+                        }
+                    ]).then()
+                    break;
+                case 'React':
+                    break;
             }
+            return 
         })
     }).then(context => {
         console.log('开始生成文件', context)
@@ -141,5 +155,7 @@ function createProjectDir () {
         return generator(context)
     }).then(context => {
         console.log('创建成功')
-    }).catch(err => {})
+    }).catch(err => {
+        console.log(err)
+    })
 }
